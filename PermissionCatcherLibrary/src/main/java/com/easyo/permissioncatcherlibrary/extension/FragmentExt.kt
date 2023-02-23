@@ -7,7 +7,7 @@ import com.easyo.permissioncatcherlibrary.DENIED
 import com.easyo.permissioncatcherlibrary.EXPLAINED
 
 
-fun Fragment.getPermissionActivityResultLauncher(
+fun Fragment.setPermissionCatcherResultLauncher(
     allGranted: () -> Unit,
     denied: () -> Unit,
     explained: () -> Unit
