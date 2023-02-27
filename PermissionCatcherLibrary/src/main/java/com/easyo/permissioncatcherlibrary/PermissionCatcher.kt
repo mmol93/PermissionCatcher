@@ -17,8 +17,10 @@ class PermissionCatcher(activityRef: WeakReference<AppCompatActivity>) {
         const val PERMISSION_STORAGE = Manifest.permission.WRITE_EXTERNAL_STORAGE
     }
 
-    private var permissions: Array<String>? = null
-    private var allPermissionGranted: ((String) -> Unit)? = null
+    private var permissionArray: Array<String>? = null
+    private var allPermissionGranted: (() -> Unit)? = null
+    private var permissionDenied: ((List<String>) -> Unit)? = null
+    private var permissionExplained: ((List<String>) -> Unit)? = null
 
     private val permissionRequestLauncher =
         activity?.let {
@@ -27,23 +29,22 @@ class PermissionCatcher(activityRef: WeakReference<AppCompatActivity>) {
                 when {
                     deniedPermissionList.isNotEmpty() -> {
                         val map = deniedPermissionList.groupBy { permission ->
-                            if (shouldShowRequestPermissionRationale(
-                                    activity,
-                                    permission
-                                )
-                            ) DENIED else EXPLAINED
+                            if (shouldShowRequestPermissionRationale(activity, permission)) DENIED else EXPLAINED
                         }
                         map[DENIED]?.let {
                             println("my DENIED: ${map[DENIED]}")
                             // 단순히 권한이 거부 되었을 때
+                            permissionDenied?.invoke(it)
                         }
                         map[EXPLAINED]?.let {
                             println("my EXPLAINED: ${map[EXPLAINED]}")
                             // 권한 요청이 완전히 막혔을 때(주로 앱 상세 창 열기)
+                            permissionExplained?.invoke(it)
                         }
                     }
                     else -> {
                         // 모든 권한이 허가 되었을 때
+                        allPermissionGranted?.invoke()
                     }
                 }
             }
@@ -52,13 +53,23 @@ class PermissionCatcher(activityRef: WeakReference<AppCompatActivity>) {
 
     private var onPermissionResult: (Boolean) -> Unit = {}
 
-    fun setPermissionArray(permissionArray: Array<String>): PermissionCatcher {
-        permissions = permissionArray
+    fun setPermissions(permissionArray: Array<String>): PermissionCatcher {
+        this.permissionArray = permissionArray
         return this
     }
 
-    fun setAllPermissionGranted(allPermissionGranted: (String) -> Unit): PermissionCatcher {
+    fun setAllPermissionGranted(allPermissionGranted: () -> Unit): PermissionCatcher {
         this.allPermissionGranted = allPermissionGranted
+        return this
+    }
+
+    fun setPermissionDenied(permissionDenied: (List<String>) -> Unit): PermissionCatcher {
+        this.permissionDenied = permissionDenied
+        return this
+    }
+
+    fun setPermissionExplained(permissionExplained: (List<String>) -> Unit): PermissionCatcher {
+        this.permissionExplained = permissionExplained
         return this
     }
 
@@ -71,9 +82,9 @@ class PermissionCatcher(activityRef: WeakReference<AppCompatActivity>) {
                 onPermissionResult(true)
             } else {
                 // Permission is not granted, request it
-                permissionRequestLauncher?.launch(permissions)
+                permissionRequestLauncher?.launch(permissionArray)
             }
-        } ?: run { Log.e(this@PermissionCatcher.javaClass.simpleName, "activity WeakReference is null") }
+        } ?: run { Log.e(this@PermissionCatcher.javaClass.simpleName, "activity WeakReference value is null") }
     }
 }
 

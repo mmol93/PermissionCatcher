@@ -27,7 +27,7 @@ class MainActivity : AppCompatActivity() {
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private val permissionCatcher = PermissionCatcher(WeakReference(this))
-        .setPermissionArray(arrayOf(android.Manifest.permission.POST_NOTIFICATIONS))
+        .setPermissions(arrayOf(android.Manifest.permission.POST_NOTIFICATIONS))
         .setAllPermissionGranted {
 
         }
