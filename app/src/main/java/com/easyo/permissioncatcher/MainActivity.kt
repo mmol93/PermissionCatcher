@@ -1,9 +1,8 @@
 package com.easyo.permissioncatcher
 
-import android.os.Build
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import com.easyo.permissioncatcher.databinding.ActivityMainBinding
@@ -39,8 +38,6 @@ class MainActivity : AppCompatActivity() {
             Log.d("my", "완전 거부된 권한: $it")
         }
 
-
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
@@ -53,6 +50,8 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-
+        binding.openFragment.setOnClickListener {
+            startActivity(Intent(this, FirstActivity::class.java))
+        }
     }
 }

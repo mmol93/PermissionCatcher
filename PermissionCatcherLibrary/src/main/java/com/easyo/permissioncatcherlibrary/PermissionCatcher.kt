@@ -1,20 +1,24 @@
 package com.easyo.permissioncatcherlibrary
 
 import android.content.pm.PackageManager
-import android.util.Log
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 
-class PermissionCatcher(private val activity: AppCompatActivity) {
+class PermissionCatcher {
     private var permissionArray: Array<String>? = null
     private var allPermissionGranted: (() -> Unit)? = null
     private var permissionDenied: ((List<String>) -> Unit)? = null
     private var permissionExplained: ((List<String>) -> Unit)? = null
-
-    private val permissionRequestLauncher =
-        activity.registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+    private lateinit var activity: AppCompatActivity
+    private lateinit var fragment: Fragment
+    private val permissionRequestLauncher: ActivityResultLauncher<Array<String>>
+    constructor(activity: AppCompatActivity) {
+        this.activity = activity
+        permissionRequestLauncher = activity.registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
             val deniedPermissionList = permissions.filter { !it.value }.map { it.key }
             when {
                 deniedPermissionList.isNotEmpty() -> {
@@ -38,6 +42,35 @@ class PermissionCatcher(private val activity: AppCompatActivity) {
                 }
             }
         }
+    }
+
+    constructor(fragment: Fragment) {
+        this.fragment = fragment
+        permissionRequestLauncher = fragment.registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+            val deniedPermissionList = permissions.filter { !it.value }.map { it.key }
+            when {
+                deniedPermissionList.isNotEmpty() -> {
+                    val map = deniedPermissionList.groupBy { permission ->
+                        if (shouldShowRequestPermissionRationale(fragment.requireActivity(), permission)) DENIED else EXPLAINED
+                    }
+                    map[DENIED]?.let {
+                        println("my DENIED: ${map[DENIED]}")
+                        // 단순히 권한이 거부 되었을 때
+                        permissionDenied?.invoke(it)
+                    }
+                    map[EXPLAINED]?.let {
+                        println("my EXPLAINED: ${map[EXPLAINED]}")
+                        // 권한 요청이 완전히 막혔을 때(주로 앱 상세 창 열기)
+                        permissionExplained?.invoke(it)
+                    }
+                }
+                else -> {
+                    // 모든 권한이 허가 되었을 때
+                    allPermissionGranted?.invoke()
+                }
+            }
+        }
+    }
 
     fun setPermissions(permissionArray: Array<String>): PermissionCatcher {
         this.permissionArray = permissionArray
@@ -61,10 +94,9 @@ class PermissionCatcher(private val activity: AppCompatActivity) {
 
     fun requestPermission(allPermissionGranted: (() -> Unit)? = null) {
         this.allPermissionGranted = allPermissionGranted
-        Log.d("my", "requested permissions: ${permissionArray?.size}")
 
         permissionArray?.filter {
-            ContextCompat.checkSelfPermission(activity, it) == PackageManager.PERMISSION_DENIED
+            ContextCompat.checkSelfPermission(if (::activity.isInitialized) activity else fragment.requireContext(), it) == PackageManager.PERMISSION_DENIED
         }?.toTypedArray().also { permissionRequestLauncher.launch(it) }
     }
 }
