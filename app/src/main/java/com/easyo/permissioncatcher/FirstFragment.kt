@@ -25,17 +25,14 @@ class FirstFragment : Fragment() {
             )
         )
         .setAllPermissionGranted {
-            TestLibrary.makeToast(requireContext(), "모든 권한 통과1")
-            Log.d("my", "모든 권한 통과1")
+            Log.d(LOG_TAG, "all permission is granted1")
         }
         .setPermissionDenied {
-            TestLibrary.makeToast(requireContext(), "거부된 권한: $it")
-            Log.d("my", "거부된 권한: $it")
+            Log.d(LOG_TAG, "denied permissions: $it")
 
         }
         .setPermissionExplained {
-            TestLibrary.makeToast(requireContext(), "완전 거부된 권한: $it")
-            Log.d("my", "완전 거부된 권한: $it")
+            Log.d(LOG_TAG, "explained permissions: $it")
         }
 
     override fun onCreateView(

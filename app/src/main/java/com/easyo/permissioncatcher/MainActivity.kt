@@ -7,7 +7,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import com.easyo.permissioncatcher.databinding.ActivityMainBinding
 import com.easyo.permissioncatcherlibrary.*
-import com.easyo.permissioncatcherlibrary.TestLibrary.makeToast
+
+const val LOG_TAG = "TEST"
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -25,28 +26,24 @@ class MainActivity : AppCompatActivity() {
             )
         )
         .setAllPermissionGranted {
-            makeToast(this, "모든 권한 통과1")
-            Log.d("my", "모든 권한 통과1")
+            Log.d(LOG_TAG, "all permission is granted1")
         }
         .setPermissionDenied {
-            makeToast(this, "거부된 권한: $it")
-            Log.d("my", "거부된 권한: $it")
+            Log.d(LOG_TAG, "denied permissions: $it")
 
         }
         .setPermissionExplained {
-            makeToast(this, "완전 거부된 권한: $it")
-            Log.d("my", "완전 거부된 권한: $it")
+            Log.d(LOG_TAG, "explained permissions: $it")
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         setContentView(binding.root)
-        Log.d("my", "onCreate")
+        Log.d(LOG_TAG, "onCreate")
         binding.checkPermission.setOnClickListener {
             permissionCatcher.requestPermission {
-                makeToast(this, "모든 권한 통과2")
-                Log.d("my", "모든 권한 통과2")
+                Log.d(LOG_TAG, "all permission is granted2")
             }
         }
 
