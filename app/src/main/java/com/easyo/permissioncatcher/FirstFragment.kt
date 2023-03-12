@@ -1,17 +1,16 @@
 package com.easyo.permissioncatcher
 
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import androidx.appcompat.app.AppCompatActivity
-import androidx.databinding.DataBindingUtil
-import com.easyo.permissioncatcher.databinding.ActivityMainBinding
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import com.easyo.permissioncatcher.databinding.FragmentFirstBinding
 import com.easyo.permissioncatcherlibrary.*
 
-const val LOG_TAG = "TEST"
-
-class MainActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityMainBinding
+class FirstFragment : Fragment() {
+    private lateinit var binding: FragmentFirstBinding
     private val permissionCatcher = PermissionCatcher(this)
         .setPermissions(
             arrayOf(
@@ -36,19 +35,20 @@ class MainActivity : AppCompatActivity() {
             Log.d(LOG_TAG, "explained permissions: $it")
         }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
-        setContentView(binding.root)
-        Log.d(LOG_TAG, "onCreate")
-        binding.checkPermission.setOnClickListener {
-            permissionCatcher.requestPermission {
-                Log.d(LOG_TAG, "all permission is granted2")
-            }
-        }
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        // Inflate the layout for this fragment
+        binding = FragmentFirstBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
-        binding.openFragment.setOnClickListener {
-            startActivity(Intent(this, FirstActivity::class.java))
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        binding.checkPermission.setOnClickListener {
+            permissionCatcher.requestPermission()
         }
     }
 }
