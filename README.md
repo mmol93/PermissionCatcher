@@ -18,9 +18,13 @@ allprojects {
 ### 2. add dependency in your module gradle
 ``` kotlin
 dependencies {
-    implementation 'com.github.mmol93:PermissionCatcher:Tag'
+    implementation 'com.github.mmol93:PermissionCatcher:x.x.x'
 }
 ```
+you should set version instead of x.x.x
+for example,
+
+`implementation 'com.github.mmol93:PermissionCatcher:2.0.4'`
 
 ---------
 
