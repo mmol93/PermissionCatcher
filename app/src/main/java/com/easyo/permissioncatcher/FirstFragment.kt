@@ -16,8 +16,6 @@ class FirstFragment : Fragment() {
             arrayOf(
                 PERMISSION_CAMERA,
                 PERMISSION_LOCATION_COARSE,
-                PERMISSION_STORAGE_READ,
-                PERMISSION_STORAGE_WRITE,
                 PERMISSION_PHONE_CALL,
                 PERMISSION_PHONE_READ_LOG,
                 PERMISSION_SMS_READ,
@@ -25,7 +23,7 @@ class FirstFragment : Fragment() {
             )
         )
         .setAllPermissionGranted {
-            Log.d(LOG_TAG, "all permission is granted1")
+            Log.d(LOG_TAG, "all permission is granted")
         }
         .setPermissionDenied {
             Log.d(LOG_TAG, "denied permissions: $it")
@@ -33,6 +31,9 @@ class FirstFragment : Fragment() {
         }
         .setPermissionExplained {
             Log.d(LOG_TAG, "explained permissions: $it")
+        }
+        .setSomePermissionGranted {
+            Log.d(LOG_TAG, "granted permission: $it")
         }
 
     override fun onCreateView(
