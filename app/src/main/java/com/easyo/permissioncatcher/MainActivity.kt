@@ -26,14 +26,16 @@ class MainActivity : AppCompatActivity() {
             )
         )
         .setAllPermissionGranted {
-            Log.d(LOG_TAG, "all permission is granted1")
+            Log.d(LOG_TAG, "all permission is granted")
         }
         .setPermissionDenied {
             Log.d(LOG_TAG, "denied permissions: $it")
-
         }
         .setPermissionExplained {
             Log.d(LOG_TAG, "explained permissions: $it")
+        }
+        .setSomePermissionGranted {
+            Log.d(LOG_TAG, "granted permission: $it")
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {

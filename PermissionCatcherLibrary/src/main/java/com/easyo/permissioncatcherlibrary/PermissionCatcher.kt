@@ -13,6 +13,7 @@ class PermissionCatcher {
     private var allPermissionGranted: (() -> Unit)? = null
     private var permissionDenied: ((List<String>) -> Unit)? = null
     private var permissionExplained: ((List<String>) -> Unit)? = null
+    private var somePermissionGranted: ((List<String>) -> Unit)? = null
     private lateinit var activity: AppCompatActivity
     private lateinit var fragment: Fragment
     private val permissionRequestLauncher: ActivityResultLauncher<Array<String>>
@@ -32,16 +33,14 @@ class PermissionCatcher {
                             ) DENIED else EXPLAINED
                         }
                         map[DENIED]?.let {
-                            println("my DENIED: ${map[DENIED]}")
                             permissionDenied?.invoke(it)
                         }
                         map[EXPLAINED]?.let {
-                            println("my EXPLAINED: ${map[EXPLAINED]}")
                             permissionExplained?.invoke(it)
                         }
                     }
+
                     else -> {
-                        // 모든 권한이 허가 되었을 때
                         allPermissionGranted?.invoke()
                     }
                 }
@@ -63,14 +62,13 @@ class PermissionCatcher {
                             ) DENIED else EXPLAINED
                         }
                         map[DENIED]?.let {
-                            println("my DENIED: ${map[DENIED]}")
                             permissionDenied?.invoke(it)
                         }
                         map[EXPLAINED]?.let {
-                            println("my EXPLAINED: ${map[EXPLAINED]}")
                             permissionExplained?.invoke(it)
                         }
                     }
+
                     else -> {
                         allPermissionGranted?.invoke()
                     }
@@ -98,6 +96,11 @@ class PermissionCatcher {
         return this
     }
 
+    fun setSomePermissionGranted(somePermissionGranted: (List<String>) -> Unit): PermissionCatcher {
+        this.somePermissionGranted = somePermissionGranted
+        return this
+    }
+
     fun requestPermission(allPermissionGranted: (() -> Unit)? = null) {
         this.allPermissionGranted = allPermissionGranted
 
@@ -107,6 +110,17 @@ class PermissionCatcher {
                 it
             ) == PackageManager.PERMISSION_DENIED
         }?.toTypedArray().also { permissionRequestLauncher.launch(it) }
+
+        val grantedPermissions = permissionArray?.filter {
+            ContextCompat.checkSelfPermission(
+                if (::activity.isInitialized) activity else fragment.requireContext(),
+                it
+            ) == PackageManager.PERMISSION_GRANTED
+        }?.toList()
+
+        if (!grantedPermissions.isNullOrEmpty()) {
+            somePermissionGranted?.invoke(grantedPermissions)
+        }
     }
 }
 
