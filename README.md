@@ -2,6 +2,9 @@
 
 [![](https://jitpack.io/v/mmol93/PermissionCatcher.svg)](https://jitpack.io/#mmol93/PermissionCatcher)
 
+## Required
+1. minSdk is at least 26
+
 ## How to install
 
 ### 1. set maven in your settings.grdle
@@ -14,6 +17,20 @@ allprojects {
 }
 ```
 
+or 
+
+``` kotlin
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+
+        // add here
+        maven { url "https://jitpack.io" }
+    }
+}
+```
 
 ### 2. add dependency in your module gradle
 ``` kotlin
